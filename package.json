@@ -1,0 +1,23 @@
+{
+  "name": "IseeU",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node_modules/.bin/http-server _build -c-1 -i -p3000",
+    "dev": "node_modules/.bin/grunt",
+    "clean": "node_modules/.bin/grunt clean"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "http-server": "*",
+    "coffee-script": "*",
+    "grunt": "*",
+    "grunt-cli": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-coffeelint": "*",
+    "grunt-contrib-coffee": "*"
+  }
+}
