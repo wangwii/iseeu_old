@@ -49,7 +49,7 @@
         "className": "input-group-addon cursor-hand"
       }, React.createElement("img", {
         "ref": "loading",
-        "src": "/vendor/images/loading-min.gif",
+        "src": "vendor/images/loading-min.gif",
         "style": {
           visibility: 'hidden'
         }
