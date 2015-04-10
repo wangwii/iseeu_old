@@ -1,0 +1,21 @@
+.panel{
+    margin-bottom: 0 !important;
+    border-width: 0;
+}
+.panel-body {
+    padding: 0 !important;
+    height: 100%;
+}
+
+.slick-slider {
+    margin-bottom: 0 !important;
+}
+
+.cursor-hand {
+    cursor: pointer !important;
+    font-size: 24pt;
+}
+
+.xslider {
+    width: 800px;
+}
