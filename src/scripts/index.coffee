@@ -2,14 +2,14 @@ class BingSearcher
   constructor: (api_key, format = 'json') ->
     @url = 'https://api.datamarket.azure.com/Bing/Search/v1/Image'
     @options =
-      dataType: format,
+      dataType: format
       headers:
         Authorization: "Basic #{api_key}"
 
-  search: (q) ->
+  search: (q, top = 100, skip = 0) ->
     dtd = $.Deferred();
 
-    data = {'Query': "'#{q}'", '$format': @options.dataType}
+    data = {'Query': "'#{q}'", '$format': @options.dataType, '$top': 100, '$skip': 0}
     opts = $.extend {data: data}, @options
 
     opts.success = (data, status, xhr)->

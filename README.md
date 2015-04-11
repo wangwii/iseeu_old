@@ -8,6 +8,7 @@ Dev Commands:
 2. *npm run-script dev*, start watch files change and automation publish to _build directory.
 
 
+Bing Search API: https://datamarket.azure.com/dataset/bing/search#schema
 Bing's Image object example:
 {
   ContentType: "image/jpeg"
@@ -32,3 +33,5 @@ Other refs:
 http://runjs.cn/code/6hxg50zi
 https://github.com/designmodo/Flat-UI
 https://github.com/kenwheeler/slick
+
+Javascript full screen: http://davidwalsh.name/fullscreen

@@ -67,7 +67,7 @@ ActionBarPanel = React.createClass
 
   render: ->
     <div className="action-bar">
-      <span className="" aria-hidden="true">{@state.text} {@state.loaded}/{@state.total}</span><br/>
+      <span className="status" aria-hidden="true">{@state.loaded}/{@state.total}</span><br/>
       <span className="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>
       <span className="glyphicon glyphicon-share" aria-hidden="true"></span>
       <span className="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span>
@@ -79,8 +79,8 @@ ImageSliderPanel = React.createClass
 
   initSlick: ->
     opts = {
-        arrows: false, autoplay: true, infinite: true,
-        mobileFirst: true, variableWidth: true
+        arrows: false, autoplay: true
+        infinite: true, mobileFirst: true, variableWidth: true
     }
     @slick = $(@refs.slick.getDOMNode()).slick opts
 
@@ -108,14 +108,20 @@ ImageSliderPanel = React.createClass
     [width, height] = [panel.width(), panel.height()]
 
     displayImg = {title: img.Title}
+    #displayImg.originSize = {size: img.Width + 'x' + img.Height, tsize: img.Thumbnail.Width + 'x' + img.Thumbnail.Height}
+    #displayImg.screenSize = width + 'x' + height
+
     img = img.Thumbnail if width <= img.Thumbnail.Width and height <= img.Thumbnail.Height
     displayImg.src = img.MediaUrl
 
     rate = if width < img.Width then width / img.Width else 1
-    _.merge(displayImg, {width: width, height: Math.round(img.Height * rate)}) if rate isnt 1
+    if rate isnt 1
+      _.merge(displayImg, {width: width, height: Math.round(img.Height * rate)})
+    else
+      _.merge(displayImg, {width: img.Width, height: img.Height})
 
-    rate = if height < img.Height then height / img.Height else 1
-    _.merge(displayImg, {height: height, width: Math.round(img.Width * rate)}) if rate isnt 1
+    rate = if height < displayImg.height then height / displayImg.height else 1
+    _.merge(displayImg, {height: height, width: Math.round(displayImg.width * rate)}) if rate isnt 1
 
     return displayImg
 
@@ -128,6 +134,10 @@ ImageSliderPanel = React.createClass
     imgLoader.height = img.height
     imgLoader.src = img.src
     imgLoader.title = img.title
+    $(imgLoader).width(img.width).height(img.height)
+
+    #imgLoader.alt = 'L:' + img.originSize.size + '||T:' + img.originSize.tsize + '||S:'
+        #+ img.screenSize + '||C:' + img.width + 'x' + img.height
 
   componentDidMount: ->
     @initSlick()
