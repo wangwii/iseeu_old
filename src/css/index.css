@@ -2,6 +2,7 @@
     margin-bottom: 0 !important;
     border-width: 0;
 }
+
 .panel-body {
     padding: 0 !important;
     height: 100%;
@@ -13,9 +14,28 @@
 
 .cursor-hand {
     cursor: pointer !important;
-    font-size: 24pt;
+    font-size: 2em;
 }
 
-.xslider {
-    width: 800px;
+.search-bar {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+}
+
+.action-bar {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    font-size: 1.2em;
+    opacity: 0.2;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(opacity=20)";
+    filter:alpha(opacity=50);
+}
+
+.action-bar span {
+    margin: 0 10px;
+    color: red;
+    line-height: 34px;
+    cursor: pointer !important;
 }
