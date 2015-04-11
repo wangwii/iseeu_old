@@ -1,5 +1,5 @@
 (function() {
-  var ImageGallery, ImageSliderPanel, MainPanel, SearchPanel;
+  var ActionBarPanel, ImageGallery, ImageSliderPanel, MainPanel, SearchPanel;
 
   SearchPanel = React.createClass({
     componentDidMount: function() {},
@@ -42,7 +42,7 @@
     },
     render: function() {
       return React.createElement("div", {
-        "className": "panel-heading has-success"
+        "className": "panel-heading search-bar"
       }, React.createElement("div", {
         "className": "input-group"
       }, React.createElement("span", {
@@ -76,9 +76,7 @@
         __next: false
       };
     },
-    componentDidMount: function() {
-      return console.log(this.getDOMNode());
-    },
+    componentDidMount: function() {},
     render: function() {
       var idx, image, imgs, title, url;
       imgs = (function() {
@@ -101,6 +99,32 @@
       return React.createElement("div", {
         "className": "panel-body"
       }, "Panel content");
+    }
+  });
+
+  ActionBarPanel = React.createClass({
+    getInitialState: function() {
+      return {
+        total: 0,
+        loaded: 0
+      };
+    },
+    render: function() {
+      return React.createElement("div", {
+        "className": "action-bar"
+      }, React.createElement("span", {
+        "className": "status",
+        "aria-hidden": "true"
+      }, this.state.loaded, "\x2F", this.state.total), React.createElement("br", null), React.createElement("span", {
+        "className": "glyphicon glyphicon-heart-empty",
+        "aria-hidden": "true"
+      }), React.createElement("span", {
+        "className": "glyphicon glyphicon-share",
+        "aria-hidden": "true"
+      }), React.createElement("span", {
+        "className": "glyphicon glyphicon-piggy-bank",
+        "aria-hidden": "true"
+      }));
     }
   });
 
@@ -129,7 +153,8 @@
       slickNode.children().each(function(idx, img) {
         return React.unmountComponentAtNode(img);
       });
-      return slickNode.empty();
+      slickNode.empty();
+      return this.loadedImgCount = 0;
     },
     stopImgLoader: function() {
       return window.stop();
@@ -142,27 +167,73 @@
       this.destroySlick();
       return this.initSlick();
     },
+    scalingImg: function(img) {
+      var displayImg, height, panel, rate, width, _ref;
+      panel = $(this.getDOMNode());
+      _ref = [panel.width(), panel.height()], width = _ref[0], height = _ref[1];
+      displayImg = {
+        title: img.Title
+      };
+      if (width <= img.Thumbnail.Width && height <= img.Thumbnail.Height) {
+        img = img.Thumbnail;
+      }
+      displayImg.src = img.MediaUrl;
+      rate = width < img.Width ? width / img.Width : 1;
+      if (rate !== 1) {
+        _.merge(displayImg, {
+          width: width,
+          height: Math.round(img.Height * rate)
+        });
+      } else {
+        _.merge(displayImg, {
+          width: img.Width,
+          height: img.Height
+        });
+      }
+      rate = height < displayImg.height ? height / displayImg.height : 1;
+      if (rate !== 1) {
+        _.merge(displayImg, {
+          height: height,
+          width: Math.round(displayImg.width * rate)
+        });
+      }
+      return displayImg;
+    },
     loadNextImage: function() {
       var img, imgLoader;
       if (this.imageQueue.length < 1) {
         return;
       }
       imgLoader = this.refs.imgLoader.getDOMNode();
-      img = this.imageQueue.shift();
-      imgLoader.width = img.Width;
-      imgLoader.height = img.Height;
-      return imgLoader.src = img.MediaUrl;
+      img = this.scalingImg(this.imageQueue.shift());
+      imgLoader.width = img.width;
+      imgLoader.height = img.height;
+      imgLoader.src = img.src;
+      imgLoader.title = img.title;
+      return $(imgLoader).width(img.width).height(img.height);
     },
     componentDidMount: function() {
-      return this.initSlick();
+      this.initSlick();
+      if (!this.loadedImgCount) {
+        this.loadedImgCount = 0;
+      }
+      return this.refs.actionBar.setState({
+        total: this.totalImgCount,
+        loaded: this.loadedImgCount
+      });
     },
     handleClick: function(event) {
       return this.slick.slick('slickNext');
     },
     handleImageLoaded: function(event) {
       var img;
+      this.loadedImgCount = this.loadedImgCount + 1;
+      this.refs.actionBar.setState({
+        total: this.totalImgCount,
+        loaded: this.loadedImgCount
+      });
       img = event.currentTarget;
-      img = $(img).clone(true).removeAttr('style').removeAttr('data-reactid').removeAttr('data-stop');
+      img = $(img).clone(true).removeAttr('style').removeAttr('data-reactid');
       this.slick.slick('slickAdd', img);
       return this.loadNextImage();
     },
@@ -182,6 +253,7 @@
         }
         return _results;
       }).call(this);
+      this.totalImgCount = this.imageQueue.length;
       setTimeout(this.loadNextImage, 500);
       return React.createElement("div", {
         "className": "panel-body cursor-hand"
@@ -196,45 +268,13 @@
       }), React.createElement("div", {
         "ref": "slick",
         "className": "slider"
+      }), React.createElement(ActionBarPanel, {
+        "ref": "actionBar"
       }));
     }
   });
 
   MainPanel = React.createClass({
-    getAvailableScreenSize: function() {
-      var panel;
-      if (this.availableSize) {
-        return this.availableSize;
-      }
-      panel = $(this.refs.imageGallery.getDOMNode());
-      this.availableSize = {
-        width: panel.width(),
-        height: panel.height()
-      };
-      return this.availableSize;
-    },
-    resizeImageFor: function(img, size) {
-      var height, rate, title, width;
-      width = size.width, height = size.height;
-      title = img.Title;
-      if (width < img.Thumbnail.Width && height < img.Thumbnail.Height) {
-        img = img.Thumbnail;
-      }
-      rate = width < img.Width ? width / img.Width : 1;
-      if (rate !== 1) {
-        img.Width = width;
-        img.Height = Math.round(img.Height * rate);
-      }
-      rate = height < img.Height ? height / img.Height : 1;
-      if (rate !== 1) {
-        img.Height = height;
-        img.Width = Math.round(img.Width * rate);
-      }
-      if (img.Title) {
-        img.Title = title;
-      }
-      return img;
-    },
     componentDidMount: function() {
       return $(window).resize((function(_this) {
         return function() {
@@ -243,43 +283,32 @@
       })(this));
     },
     handleWindowResize: function() {
-      var imagePanel, mainHeight, mainPanel, searchHeight, searchPanel, _ref;
-      _ref = [this.refs.mainPanel, this.refs.searchPanel, this.refs.imageGallery], mainPanel = _ref[0], searchPanel = _ref[1], imagePanel = _ref[2];
-      mainHeight = $(window).height();
-      searchHeight = $(searchPanel.getDOMNode()).outerHeight();
-      $(mainPanel.getDOMNode()).height(mainHeight);
-      return $(imagePanel.getDOMNode()).height(mainHeight - searchHeight);
+      $(this.refs.mainPanel.getDOMNode()).height($(window).height());
+      return $(this.refs.mainPanel.getDOMNode()).width($(window).width());
     },
-    handleBeforeSearch: function() {
-      var dom;
-      return dom = this.refs.imageGallery.getDOMNode();
-    },
+    handleBeforeSearch: function() {},
     handleSearched: function(data) {
-      var image, images, size;
-      size = this.getAvailableScreenSize();
-      images = (function() {
-        var _i, _len, _ref, _results;
-        _ref = data.results;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          image = _ref[_i];
-          _results.push(this.resizeImageFor(image, size));
-        }
-        return _results;
-      }).call(this);
+      var images;
+      images = data.results;
       this.refs.imageGallery.refresh();
-      return this.refs.imageGallery.setState({
+      this.refs.imageGallery.setState({
         images: images,
         nextPage: data.__next
       });
+      return this.hideSearchPanel();
+    },
+    hideSearchPanel: function() {
+      return $(this.refs.searchPanel.getDOMNode()).slideUp(200);
+    },
+    handleDblClick: function() {
+      return $(this.refs.searchPanel.getDOMNode()).toggle(200);
     },
     render: function() {
       return React.createElement("div", {
-        "className": "container-fluid"
+        "className": "container-fluid",
+        "onDoubleClick": this.handleDblClick
       }, React.createElement("div", {
-        "className": "row"
-      }, React.createElement("div", {
-        "className": "panel panel-success",
+        "className": "row panel",
         "ref": 'mainPanel'
       }, React.createElement(SearchPanel, {
         "ref": "searchPanel",
@@ -287,7 +316,7 @@
         "onBeforeSearch": this.handleBeforeSearch
       }), React.createElement(ImageSliderPanel, {
         "ref": "imageGallery"
-      }))));
+      })));
     }
   });
 

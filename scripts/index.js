@@ -15,12 +15,20 @@
       };
     }
 
-    BingSearcher.prototype.search = function(q) {
+    BingSearcher.prototype.search = function(q, top, skip) {
       var data, dtd, opts;
+      if (top == null) {
+        top = 100;
+      }
+      if (skip == null) {
+        skip = 0;
+      }
       dtd = $.Deferred();
       data = {
         'Query': "'" + q + "'",
-        '$format': this.options.dataType
+        '$format': this.options.dataType,
+        '$top': 100,
+        '$skip': 0
       };
       opts = $.extend({
         data: data
