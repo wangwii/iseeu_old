@@ -12,6 +12,8 @@
   "devDependencies": {
     "http-server": "*",
     "coffee-script": "*",
+    "mocha": "*",
+    "chai": "*",
     "grunt": "*",
     "grunt-cli": "*",
     "grunt-contrib-watch": "*",

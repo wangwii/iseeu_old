@@ -126,7 +126,7 @@ ImageSliderPanel = React.createClass
     return displayImg
 
   loadNextImage: ->
-    return if @imageQueue.length < 1
+    return @finished = true if @imageQueue.length < 1
     imgLoader = @refs.imgLoader.getDOMNode()
 
     img = @scalingImg(@imageQueue.shift())
@@ -138,6 +138,10 @@ ImageSliderPanel = React.createClass
 
     #imgLoader.alt = 'L:' + img.originSize.size + '||T:' + img.originSize.tsize + '||S:'
         #+ img.screenSize + '||C:' + img.width + 'x' + img.height
+
+  addImages: (images)->
+    @imageQueue = @imageQueue.concat(images)
+    setTimeout @loadNextImage, 100 if @finished
 
   componentDidMount: ->
     @initSlick()
@@ -164,7 +168,7 @@ ImageSliderPanel = React.createClass
   render: ->
     @imageQueue = (image for image in @state.images)
     @totalImgCount = @imageQueue.length
-    setTimeout @loadNextImage, 500
+    setTimeout @loadNextImage, 100
 
     <div className="panel-body cursor-hand">
         <img ref="imgLoader" onLoad={@handleImageLoaded} onError={@handleImageLoadFailed} onClick={@handleClick} style={display: 'none'}/>
@@ -186,9 +190,10 @@ MainPanel = React.createClass
   handleSearched: (data)->
     images = data.results
 
-    @refs.imageGallery.refresh()
-    @refs.imageGallery.setState {images: images, nextPage: data.__next}
-    @hideSearchPanel()
+    # @refs.imageGallery.refresh()
+    # @refs.imageGallery.setState {images: images, nextPage: data.__next}
+    # @hideSearchPanel()
+    @refs.imageGallery.addImages(images);
 
   hideSearchPanel: ->
     $(@refs.searchPanel.getDOMNode()).slideUp(200)
